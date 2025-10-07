@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mindhaven/services/auth_service.dart';
+import 'package:mindhaven/utils/trial_manager.dart';
 import 'home_screen.dart';
 import 'signup_screen.dart';
 
@@ -32,6 +33,9 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (!mounted) return;
+      
+      // Mark onboarding as complete and save login state
+      await TrialManager.markOnboardingComplete();
       
       Navigator.pushReplacement(
         context,

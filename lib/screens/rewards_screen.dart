@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mindhaven/services/reward_service.dart';
-// Remove the percent_indicator import for now
 
 class RewardsScreen extends StatefulWidget {
   const RewardsScreen({super.key});
@@ -118,57 +117,69 @@ class _RewardsScreenState extends State<RewardsScreen> {
             ),
             const SizedBox(height: 24),
 
-            // Badges
-            const Text(
-              'Achievements',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            GridView.count(
-              shrinkWrap: true,
-              physics: const ScrollPhysics(), // Simple fix for scrolling physics // This should work now
-              crossAxisCount: 3,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
+            // Badges Section
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildBadge(
-                  'First Steps',
-                  Icons.emoji_events,
-                  streak >= 1,
-                  'Complete 1 day streak',
+                const Text(
+                  'Achievements',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                _buildBadge(
-                  'Consistent',
-                  Icons.star,
-                  streak >= 7,
-                  '7 day streak',
-                ),
-                _buildBadge(
-                  'Dedicated',
-                  Icons.workspace_premium,
-                  streak >= 30,
-                  '30 day streak',
-                ),
-                _buildBadge(
-                  'Writer',
-                  Icons.book,
-                  points >= 100,
-                  'Earn 100 points',
-                ),
-                _buildBadge(
-                  'Mindful',
-                  Icons.self_improvement,
-                  points >= 500,
-                  'Earn 500 points',
-                ),
-                _buildBadge(
-                  'Master',
-                  Icons.psychology,
-                  points >= 1000,
-                  'Earn 1000 points',
+                const SizedBox(height: 16),
+                // Fixed GridView with constrained height
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * 0.5, // Limit height
+                  ),
+                  child: GridView.count(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(), // Prevent nested scrolling
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 0.8, // Better aspect ratio for badges
+                    children: [
+                      _buildBadge(
+                        'First Steps',
+                        Icons.emoji_events,
+                        streak >= 1,
+                        'Complete 1 day streak',
+                      ),
+                      _buildBadge(
+                        'Consistent',
+                        Icons.star,
+                        streak >= 7,
+                        '7 day streak',
+                      ),
+                      _buildBadge(
+                        'Dedicated',
+                        Icons.workspace_premium,
+                        streak >= 30,
+                        '30 day streak',
+                      ),
+                      _buildBadge(
+                        'Writer',
+                        Icons.book,
+                        points >= 100,
+                        'Earn 100 points',
+                      ),
+                      _buildBadge(
+                        'Mindful',
+                        Icons.self_improvement,
+                        points >= 500,
+                        'Earn 500 points',
+                      ),
+                      _buildBadge(
+                        'Master',
+                        Icons.psychology,
+                        points >= 1000,
+                        'Earn 1000 points',
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -210,6 +221,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 16), // Extra padding at bottom
           ],
         ),
       ),
@@ -247,7 +259,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
         borderRadius: BorderRadius.circular(16),
       ),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12), // Reduced padding
         decoration: BoxDecoration(
           color: unlocked
               ? Colors.purple.withOpacity(0.1)
@@ -259,26 +271,29 @@ class _RewardsScreenState extends State<RewardsScreen> {
           children: [
             Icon(
               icon,
-              size: 40,
+              size: 32, // Smaller icon
               color: unlocked ? Colors.purple : Colors.grey,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
               title,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
+                fontSize: 12, // Smaller font
                 color: unlocked ? Colors.purple : Colors.grey,
               ),
               textAlign: TextAlign.center,
+              maxLines: 2, // Prevent text overflow
             ),
             const SizedBox(height: 4),
             Text(
               description,
               style: TextStyle(
-                fontSize: 10,
+                fontSize: 8, // Smaller font
                 color: unlocked ? Colors.purple : Colors.grey,
               ),
               textAlign: TextAlign.center,
+              maxLines: 2, // Prevent text overflow
             ),
           ],
         ),

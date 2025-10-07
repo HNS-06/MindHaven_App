@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mindhaven/utils/trial_manager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'intro_screen.dart';
 import 'login_screen.dart';
+import 'home_screen.dart'; // Make sure to import your home screen
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -18,6 +20,21 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   }
 
   Future<void> _navigateToNext() async {
+    // Check if user has already completed onboarding
+    final prefs = await SharedPreferences.getInstance();
+    final hasCompletedOnboarding = prefs.getBool('hasCompletedOnboarding') ?? false;
+
+    if (hasCompletedOnboarding) {
+      // User has completed onboarding - go directly to home screen
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+      return;
+    }
+
+    // First time user - wait for splash and proceed with normal flow
     await Future.delayed(const Duration(seconds: 3));
     
     final isTrialActive = await TrialManager.isTrialActive();
