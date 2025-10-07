@@ -13,27 +13,27 @@ class _TasksScreenState extends State<TasksScreen> {
   final TextEditingController _taskController = TextEditingController();
   final List<Map<String, dynamic>> _defaultTasks = [
     {
-      'task': 'Practice 5 minutes of meditation',
+      'task': 'Meditate for 5 mins',
       'points': 15,
       'icon': Icons.self_improvement,
     },
     {
-      'task': 'Write 3 things you\'re grateful for',
+      'task': 'Gratitude journal',
       'points': 10,
       'icon': Icons.emoji_emotions,
     },
     {
-      'task': 'Drink 8 glasses of water',
+      'task': 'Drink 8 glasses water',
       'points': 10,
       'icon': Icons.local_drink,
     },
     {
-      'task': 'Take a 10-minute walk outside',
+      'task': '10-min walk',
       'points': 15,
       'icon': Icons.directions_walk,
     },
     {
-      'task': 'Read for 15 minutes',
+      'task': 'Read 15 mins',
       'points': 15,
       'icon': Icons.menu_book,
     },
@@ -146,7 +146,7 @@ class _TasksScreenState extends State<TasksScreen> {
       ),
       body: Column(
         children: [
-          // Add Task
+          // Add Task Section
           Padding(
             padding: const EdgeInsets.all(16),
             child: Card(
@@ -186,121 +186,165 @@ class _TasksScreenState extends State<TasksScreen> {
             ),
           ),
 
-          // Quick Add Tasks
+          // Quick Add Tasks - FIXED: Increased height and simplified text
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: SizedBox(
-              height: 120,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: _defaultTasks.map((task) {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: Card(
-                      elevation: 2,
-                      child: InkWell(
-                        onTap: () => _addDefaultTask(task),
-                        borderRadius: BorderRadius.circular(12),
-                        child: Container(
-                          width: 140,
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(task['icon'], color: Colors.purple),
-                              const SizedBox(height: 8),
-                              Text(
-                                task['task'],
-                                style: const TextStyle(fontSize: 12),
-                                textAlign: TextAlign.center,
-                                maxLines: 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 8),
+                  child: Text(
+                    'Quick Add Tasks',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 140, // Increased height
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: _defaultTasks.map((task) {
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 12),
+                        child: Card(
+                          elevation: 2,
+                          child: InkWell(
+                            onTap: () => _addDefaultTask(task),
+                            borderRadius: BorderRadius.circular(12),
+                            child: Container(
+                              width: 140,
+                              padding: const EdgeInsets.all(12), // Reduced padding
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    task['icon'], 
+                                    color: Colors.purple,
+                                    size: 32, // Slightly smaller icon
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    task['task'],
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      height: 1.2, // Better line height
+                                    ),
+                                    textAlign: TextAlign.center,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    '+${task['points']} pts',
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                '+${task['points']} pts',
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  color: Colors.green,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
             ),
           ),
 
           const SizedBox(height: 16),
 
-          // Task List - UPDATED: Using ListView.builder instead of StreamBuilder
+          // Task List
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: FirebaseService.tasks.length,
-              itemBuilder: (context, index) {
-                final task = FirebaseService.tasks[index];
-                return Dismissible(
-                  key: Key(task['id']),
-                  direction: DismissDirection.endToStart,
-                  background: Container(
-                    color: Colors.red,
-                    alignment: Alignment.centerRight,
-                    padding: const EdgeInsets.only(right: 20),
-                    child: const Icon(
-                      Icons.delete,
-                      color: Colors.white,
-                      size: 30,
-                    ),
-                  ),
-                  confirmDismiss: (direction) async {
-                    final shouldDelete = await _showDeleteDialog(task);
-                    if (shouldDelete == true) {
-                      await _handleTaskDeletion(task);
-                      return true;
-                    }
-                    return false;
-                  },
-                  child: Card(
-                    elevation: 2,
-                    margin: const EdgeInsets.only(bottom: 12),
-                    child: ListTile(
-                      leading: Checkbox(
-                        value: task['isCompleted'] ?? false,
-                        onChanged: (value) => _toggleTask(task, value!),
-                      ),
-                      title: Text(
-                        task['task'],
-                        style: TextStyle(
-                          decoration: (task['isCompleted'] ?? false)
-                              ? TextDecoration.lineThrough
-                              : TextDecoration.none,
-                          color: (task['isCompleted'] ?? false)
-                              ? Colors.grey
-                              : null,
+            child: FirebaseService.tasks.isEmpty
+                ? const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.task_alt, size: 64, color: Colors.grey),
+                        SizedBox(height: 16),
+                        Text(
+                          'No tasks yet!\nAdd some tasks to get started.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey,
+                          ),
                         ),
-                      ),
-                      trailing: IconButton(
-                        icon: const Icon(
-                          Icons.delete_outline,
-                          color: Colors.grey,
-                        ),
-                        onPressed: () async {
-                          final shouldDelete = await _showDeleteDialog(task);
-                          if (shouldDelete == true) {
-                            await _handleTaskDeletion(task);
-                          }
-                        },
-                      ),
+                      ],
                     ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: FirebaseService.tasks.length,
+                    itemBuilder: (context, index) {
+                      final task = FirebaseService.tasks[index];
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        child: Dismissible(
+                          key: Key(task['id']),
+                          direction: DismissDirection.endToStart,
+                          background: Container(
+                            color: Colors.red,
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.only(right: 20),
+                            child: const Icon(
+                              Icons.delete,
+                              color: Colors.white,
+                              size: 30,
+                            ),
+                          ),
+                          confirmDismiss: (direction) async {
+                            final shouldDelete = await _showDeleteDialog(task);
+                            if (shouldDelete == true) {
+                              await _handleTaskDeletion(task);
+                              return true;
+                            }
+                            return false;
+                          },
+                          child: Card(
+                            elevation: 2,
+                            child: ListTile(
+                              leading: Checkbox(
+                                value: task['isCompleted'] ?? false,
+                                onChanged: (value) => _toggleTask(task, value!),
+                              ),
+                              title: Text(
+                                task['task'],
+                                style: TextStyle(
+                                  decoration: (task['isCompleted'] ?? false)
+                                      ? TextDecoration.lineThrough
+                                      : TextDecoration.none,
+                                  color: (task['isCompleted'] ?? false)
+                                      ? Colors.grey
+                                      : null,
+                                ),
+                              ),
+                              trailing: IconButton(
+                                icon: const Icon(
+                                  Icons.delete_outline,
+                                  color: Colors.grey,
+                                ),
+                                onPressed: () async {
+                                  final shouldDelete = await _showDeleteDialog(task);
+                                  if (shouldDelete == true) {
+                                    await _handleTaskDeletion(task);
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
           ),
         ],
       ),
